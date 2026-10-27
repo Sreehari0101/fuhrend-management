@@ -115,8 +115,8 @@ h1, h2, h3, p { overflow-wrap: break-word; }
 .service-card-photo { height: 225px; overflow: hidden; background: #e0e6e0; }
 .service-card-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
 .service-card:hover .service-card-photo img { transform: scale(1.025); }
-.service-card-business .service-card-photo img { object-position: center 63%; }
-.service-card-marketing .service-card-photo img { object-position: center 48%; }
+.service-card-business .service-card-photo img { object-position: center 25%; }
+.service-card-marketing .service-card-photo img { object-position: center 40%; }
 .service-card-accommodation .service-card-photo img { object-position: center 53%; }
 .service-card-body { min-height: 0; display: flex; flex: 1; flex-direction: column; padding: 27px 32px 30px; }
 .service-number { display: flex; align-items: center; gap: 16px; margin: 0 0 8px; color: #a3753e; font-family: var(--serif); font-size: 19px; line-height: 1; }
@@ -127,7 +127,7 @@ h1, h2, h3, p { overflow-wrap: break-word; }
 .service-card li + li { margin-top: 4px; }
 .service-link { width: fit-content; min-height: 30px; display: inline-flex; align-items: center; gap: 8px; margin-top: auto; border-bottom: 1px solid #ae7855; color: #9b4b35; font-size: 13px; font-weight: 600; }
 .service-link:hover { color: var(--deep); border-color: var(--deep); }
-.service-card-expat .service-card-photo img { object-position: center 61%; }
+.service-card-expat .service-card-photo img { object-position: center 20%; }
 .service-note { max-width: 820px; margin: 22px 0 0; color: #697571; font-size: 12px; line-height: 1.6; }
 
 /* Approach and closing */

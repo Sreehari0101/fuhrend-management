@@ -13,11 +13,11 @@ The email `fuhrand@xyz.com` was supplied for this draft. The displayed phone num
 - The header mark is a clean vector redraw of the supplied Fuhrend Management monogram; the supplied raster logo remains in `assets/fuhrend-logo.jpeg`.
 - Consultation: [Olena Kholina on Unsplash](https://unsplash.com/photos/two-people-reviewing-documents-at-a-table-MhqUBTxQ3Hw).
 - Mobile consultation: [Pavel Danilyuk on Pexels](https://www.pexels.com/photo/woman-signing-a-document-near-a-laptop-7518972/).
-- Digital marketing: [Derek Coleman on Unsplash](https://unsplash.com/photos/three-people-sitting-at-a-table-with-laptops-and-notebooks-Uzwig52Fpqg).
-- Relocation: [Evgeniy Beloshytskiy on Unsplash](https://unsplash.com/photos/open-suitcase-with-clothes-and-armchair-in-a-room-cDTKjvIJ-Ic).
+- The Business consultancy, Digital marketing and Expat services card images were generated specifically for this website. They depict illustrative scenes, not Fuhrend staff or clients.
+- The social preview is composed from the Fuhrend monogram and the illustrative Business consultancy image. On macOS, regenerate it with `swift scripts/build-social-preview.swift "$PWD"`.
 - Accommodation: [Clay Banks on Unsplash](https://unsplash.com/photos/a-bright-bedroom-with-a-desk-and-a-large-bed-bhoMFZB_6Bg).
 
-These photographs are illustrative, not Fuhrend staff, premises, or property listings. Replace them with approved company imagery when available.
+All site imagery is illustrative, not Fuhrend staff, premises, or property listings. Replace it with approved company imagery when available.
 
 ## Motion
 
@@ -26,5 +26,7 @@ The hero text enters in a short sequence. Selected section headings and copy fad
 ## Hosting
 
 Upload the contents of this folder to any static host. Enable HTTPS, compression and standard security headers at the host. The page includes a restrictive CSP in its HTML and uses only local assets.
+
+Before sharing the public site, replace the relative `og:image` and `twitter:image` values in `index.html` with the verified full HTTPS URL of `assets/social-preview.jpg`, and add an `og:url` tag for the canonical page URL. The deployment must allow public access to the page and image for social crawlers to show the preview.
 
 For a client-facing demo, confirm the hosting plan permits commercial use. Vercel Hobby is limited to personal, non-commercial use; Vercel Pro or a static host whose free plan allows client work is more appropriate.
