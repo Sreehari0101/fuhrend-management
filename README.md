@@ -6,7 +6,7 @@ A static, responsive information website for Fuhrend Management s.r.o. Open `ind
 
 The company name and service descriptions are based on the supplied PDF, `fuhrend info for web.pdf`. Text is edited for clarity; service outcomes are not guaranteed. Confirm the exact legal wording and preferred service terminology with the company before publication. No country or city is stated on the site because the operating location is not yet confirmed.
 
-The email `fuhrand@xyz.com` was supplied for this draft. The displayed phone number, `+12 123456`, is a non-clickable placeholder and must be replaced before publishing. Email actions use `mailto:` links; there is no contact form, visitor-data collection, or third-party script. Confirm the inbox is active before publishing.
+The email `fuhrand@xyz.com` was supplied for this draft. The displayed phone number, `+12 123456`, is a non-clickable placeholder and must be replaced before publishing. The enquiry form currently opens a prefilled email draft in the visitor's email app; it does not submit to a server, save visitor data, or use a third-party script. The visitor must send the draft themselves. Verify the inbox before publishing. Web3Forms integration is a later step and will require an approved access key, a privacy notice and a tested submission flow.
 
 ## Images
 
@@ -22,6 +22,12 @@ All site imagery is illustrative, not Fuhrend staff, premises, or property listi
 ## Motion
 
 The hero text enters in a short sequence. Selected section headings and copy fade from transparent as they rise into view; service choices and approach steps follow with a small stagger, and service photos ease in without shifting the card layout. Motion is disabled when a visitor requests reduced motion, and content remains readable without JavaScript.
+
+## Languages
+
+The site includes English (UK), Czech, Russian and German. On a first visit, it chooses a supported browser language or falls back to English, and opens the language chooser so visitors can see the other options. An explicit choice is saved in local storage. All visible copy, image descriptions, page title, description and email subject lines are maintained in `translations.js`. Without JavaScript, the English page remains readable.
+
+The language control uses a locally hosted [Lucide globe icon](https://lucide.dev/icons/globe) under the [ISC licence](https://lucide.dev/license). The browser interaction and viewport checks can be rerun on macOS with Chrome using `node scripts/verify-languages.mjs`.
 
 ## Hosting
 

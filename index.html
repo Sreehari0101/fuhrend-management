@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f7f8f5">
     <meta name="description" content="Fuhrend Management s.r.o. provides business consultancy, digital marketing, expat services and accommodation assistance.">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Fuhrend Management">
     <meta property="og:title" content="Fuhrend Management | A clearer way to move forward">
@@ -26,26 +26,48 @@
     <link rel="preload" href="assets/consultation.jpg" as="image" media="(min-width: 601px)">
     <link rel="preload" href="assets/consultation-mobile.jpg" as="image" media="(max-width: 600px)">
     <link rel="stylesheet" href="styles.css">
+    <script src="translations.js" defer></script>
     <script src="script.js" defer></script>
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
 
     <header class="site-header" id="top">
       <div class="header-inner wrap">
-        <a class="brand" href="#top" aria-label="Fuhrend Management, back to top">
+        <a class="brand" href="#top" aria-label="Fuhrend Management, back to top" data-i18n-aria="brandBack">
           <img class="brand-mark" src="assets/fuhrend-mark.svg" alt="" width="45" height="45">
           <span class="brand-name"><strong>FUHREND</strong><small>MANAGEMENT S.R.O.</small></span>
         </a>
-        <button class="menu-button" type="button" aria-controls="main-nav" aria-expanded="false">Menu <span aria-hidden="true">&#9776;</span></button>
-        <nav class="main-nav" id="main-nav" aria-label="Main navigation">
-          <a href="#about">About us</a>
-          <a href="#services">Services</a>
-          <a href="#approach">Our approach</a>
-          <a href="#contact">Contact</a>
-          <a class="nav-mobile-contact" href="mailto:fuhrand@xyz.com?subject=Fuhrend%20Management%20enquiry">Let's talk <span aria-hidden="true">&nearr;</span></a>
+        <nav class="main-nav" id="main-nav" aria-label="Main navigation" data-i18n-aria="navMain">
+          <a href="#about" data-i18n="navAbout">About us</a>
+          <a href="#services" data-i18n="navServices">Services</a>
+          <a href="#approach" data-i18n="navApproach">Our approach</a>
+          <a href="#contact" data-i18n="navContact">Contact</a>
+          <a class="nav-mobile-contact" href="#contact"><span data-i18n="navTalk">Let's talk</span> <span aria-hidden="true">&nearr;</span></a>
         </nav>
-        <a class="button header-cta" href="mailto:fuhrand@xyz.com?subject=Fuhrend%20Management%20enquiry">Let's talk <span aria-hidden="true">&nearr;</span></a>
+        <div class="header-actions">
+          <div class="language-switcher">
+            <button class="language-trigger" type="button" aria-controls="language-menu" aria-expanded="false" aria-label="Choose language, current language: English (UK)">
+              <img class="language-globe" src="assets/globe.svg" alt="" width="19" height="19">
+              <span class="language-label" data-i18n="languageLabel">Language:</span>
+              <span class="language-current">English</span>
+              <span class="language-code" aria-hidden="true">EN</span>
+              <span class="language-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="language-menu" id="language-menu" hidden>
+              <div class="language-menu-heading"><strong data-i18n="languageTitle">Choose your language</strong><span data-i18n="languageHelp">Select your preferred language.</span></div>
+              <div class="language-options" role="group" aria-label="Available languages" data-i18n-aria="languageOptions">
+                <button type="button" class="language-option" data-language="en-GB"><span><strong lang="en-GB">English (UK)</strong><small data-i18n="languageEnglish">English</small></span><span class="language-check" aria-hidden="true">&#10003;</span></button>
+                <button type="button" class="language-option" data-language="cs-CZ"><span><strong lang="cs-CZ">Čeština</strong><small data-i18n="languageCzech">Czech</small></span><span class="language-check" aria-hidden="true">&#10003;</span></button>
+                <button type="button" class="language-option" data-language="ru-RU"><span><strong lang="ru-RU">Русский</strong><small data-i18n="languageRussian">Russian</small></span><span class="language-check" aria-hidden="true">&#10003;</span></button>
+                <button type="button" class="language-option" data-language="de-DE"><span><strong lang="de-DE">Deutsch</strong><small data-i18n="languageGerman">German</small></span><span class="language-check" aria-hidden="true">&#10003;</span></button>
+              </div>
+              <p class="language-menu-foot" data-i18n="languageRemember">Your choice will be remembered.</p>
+            </div>
+          </div>
+          <a class="button header-cta" href="#contact"><span data-i18n="navTalk">Let's talk</span> <span aria-hidden="true">&nearr;</span></a>
+          <button class="menu-button" type="button" aria-controls="main-nav" aria-expanded="false"><span data-i18n="menu">Menu</span> <span aria-hidden="true">&#9776;</span></button>
+        </div>
       </div>
     </header>
 
@@ -53,37 +75,37 @@
       <section class="hero" aria-labelledby="hero-company">
         <picture class="hero-media">
           <source media="(max-width: 600px)" srcset="assets/consultation-mobile.jpg">
-          <img class="hero-image" src="assets/consultation.jpg" alt="People reviewing documents together during a consultation" width="2200" height="1467">
+          <img class="hero-image" src="assets/consultation.jpg" alt="People reviewing documents together during a consultation" data-i18n-alt="heroImageAlt" width="2200" height="1467">
         </picture>
         <div class="hero-wash" aria-hidden="true"></div>
         <div class="hero-inner wrap">
           <div class="hero-copy">
-            <p class="eyebrow">Business. People. Possibility. <span class="eyebrow-rule" aria-hidden="true"></span></p>
+            <p class="eyebrow"><span data-i18n="heroEyebrow">Business. People. Possibility.</span> <span class="eyebrow-rule" aria-hidden="true"></span></p>
             <h1 id="hero-company">Fuhrend Management</h1>
-            <p class="hero-statement">A clearer way<br><span>to move forward.</span></p>
-            <p class="hero-lead">Business consultancy, digital marketing and practical support for the decisions ahead.</p>
+            <p class="hero-statement"><span data-i18n="heroLine1">A clearer way</span><br><span class="accent" data-i18n="heroLine2">to move forward.</span></p>
+            <p class="hero-lead" data-i18n="heroLead">Business consultancy, digital marketing and practical support for the decisions ahead.</p>
             <div class="hero-actions">
-              <a class="button button-dark" href="#services">Explore our services <span aria-hidden="true">&nearr;</span></a>
-              <a class="underlined-link" href="#about">Get to know us <span aria-hidden="true">&rarr;</span></a>
+              <a class="button button-dark" href="#services"><span data-i18n="heroExplore">Explore our services</span> <span aria-hidden="true">&nearr;</span></a>
+              <a class="underlined-link" href="#about"><span data-i18n="heroKnow">Get to know us</span> <span aria-hidden="true">&rarr;</span></a>
             </div>
-            <p class="hero-meta"><span aria-hidden="true"></span> For business, growth and everyday life.</p>
+            <p class="hero-meta"><span aria-hidden="true"></span> <span data-i18n="heroMeta">For business, growth and everyday life.</span></p>
           </div>
-          <p class="hero-photo-note">The details matter.<br><span>So does your next step.</span></p>
+          <p class="hero-photo-note"><span data-i18n="heroPhoto1">The details matter.</span><br><span data-i18n="heroPhoto2">So does your next step.</span></p>
         </div>
       </section>
 
       <section class="service-wayfinder" aria-labelledby="wayfinder-title">
         <div class="wrap wayfinder-grid">
           <div class="wayfinder-heading">
-            <p class="section-index">A PLACE TO START <span class="index-rule" aria-hidden="true"></span></p>
-            <h2 id="wayfinder-title" data-reveal>What comes<br><em>next for you?</em></h2>
-            <p>Explore the support that fits the stage you're in.</p>
+            <p class="section-index"><span data-i18n="wayfinderIndex">A PLACE TO START</span> <span class="index-rule" aria-hidden="true"></span></p>
+            <h2 id="wayfinder-title" data-reveal><span data-i18n="wayfinderTitle1">What comes</span><br><em data-i18n="wayfinderTitle2">next for you?</em></h2>
+            <p data-i18n="wayfinderLead">Explore the support that fits the stage you're in.</p>
           </div>
-          <nav class="wayfinder-links" aria-label="Jump to a service">
-            <a class="wayfinder-item" data-reveal="row" href="#business"><span class="wayfinder-number">01</span><span class="wayfinder-text"><strong>Business consultancy</strong><small>Set up and move ahead with confidence.</small></span><span class="wayfinder-arrow" aria-hidden="true">&nearr;</span></a>
-            <a class="wayfinder-item" data-reveal="row" data-delay="1" href="#marketing"><span class="wayfinder-number">02</span><span class="wayfinder-text"><strong>Digital marketing</strong><small>Build a presence with purpose.</small></span><span class="wayfinder-arrow" aria-hidden="true">&nearr;</span></a>
-            <a class="wayfinder-item" data-reveal="row" data-delay="2" href="#expat"><span class="wayfinder-number">03</span><span class="wayfinder-text"><strong>Expat services</strong><small>Navigate the practicalities of a move.</small></span><span class="wayfinder-arrow" aria-hidden="true">&nearr;</span></a>
-            <a class="wayfinder-item" data-reveal="row" data-delay="3" href="#accommodation"><span class="wayfinder-number">04</span><span class="wayfinder-text"><strong>Accommodation</strong><small>Find a place that works for you.</small></span><span class="wayfinder-arrow" aria-hidden="true">&nearr;</span></a>
+          <nav class="wayfinder-links" aria-label="Jump to a service" data-i18n-aria="wayfinderNav">
+            <a class="wayfinder-item" data-reveal="row" href="#business"><span class="wayfinder-number">01</span><span class="wayfinder-text"><strong data-i18n="serviceBusiness">Business consultancy</strong><small data-i18n="wayBusiness">Set up and move ahead with confidence.</small></span><span class="wayfinder-arrow" aria-hidden="true">&nearr;</span></a>
+            <a class="wayfinder-item" data-reveal="row" data-delay="1" href="#marketing"><span class="wayfinder-number">02</span><span class="wayfinder-text"><strong data-i18n="serviceMarketing">Digital marketing</strong><small data-i18n="wayMarketing">Build a presence with purpose.</small></span><span class="wayfinder-arrow" aria-hidden="true">&nearr;</span></a>
+            <a class="wayfinder-item" data-reveal="row" data-delay="2" href="#expat"><span class="wayfinder-number">03</span><span class="wayfinder-text"><strong data-i18n="serviceExpat">Expat services</strong><small data-i18n="wayExpat">Navigate the practicalities of a move.</small></span><span class="wayfinder-arrow" aria-hidden="true">&nearr;</span></a>
+            <a class="wayfinder-item" data-reveal="row" data-delay="3" href="#accommodation"><span class="wayfinder-number">04</span><span class="wayfinder-text"><strong data-i18n="serviceAccommodation">Accommodation</strong><small data-i18n="wayAccommodation">Find a place that works for you.</small></span><span class="wayfinder-arrow" aria-hidden="true">&nearr;</span></a>
           </nav>
         </div>
       </section>
@@ -91,14 +113,14 @@
       <section class="intro section-pad" id="about" aria-labelledby="intro-title">
         <div class="wrap intro-layout">
           <div class="intro-lead">
-            <p class="section-index">01 / INTRODUCTION <span class="index-rule" aria-hidden="true"></span></p>
-            <h2 id="intro-title" data-reveal>Make space for<br><em>what matters.</em></h2>
-            <p class="intro-tagline">Practical support, shaped around real decisions.</p>
+            <p class="section-index"><span data-i18n="introIndex">01 / INTRODUCTION</span> <span class="index-rule" aria-hidden="true"></span></p>
+            <h2 id="intro-title" data-reveal><span data-i18n="introTitle1">Make space for</span><br><em data-i18n="introTitle2">what matters.</em></h2>
+            <p class="intro-tagline" data-i18n="introTagline">Practical support, shaped around real decisions.</p>
           </div>
           <div class="intro-detail">
-            <p data-reveal>Setting up a company, building a presence or arranging the practicalities of a move can quickly become a chain of unfamiliar tasks.</p>
-            <p>We help bring the details into focus, identify what is needed and make the next step easier to take.</p>
-            <a class="intro-link" href="#approach">How we work <span aria-hidden="true">&nearr;</span></a>
+            <p data-reveal data-i18n="introP1">Setting up a company, building a presence or arranging the practicalities of a move can quickly become a chain of unfamiliar tasks.</p>
+            <p data-i18n="introP2">We help bring the details into focus, identify what is needed and make the next step easier to take.</p>
+            <a class="intro-link" href="#approach"><span data-i18n="introLink">How we work</span> <span aria-hidden="true">&nearr;</span></a>
           </div>
         </div>
       </section>
@@ -106,76 +128,125 @@
       <section class="services section-pad" id="services" aria-labelledby="services-title">
         <div class="wrap">
           <div class="section-heading">
-            <div><p class="section-index">02 / WHAT WE DO <span class="index-rule" aria-hidden="true"></span></p><h2 id="services-title" data-reveal>Different needs.<br><em>Considered support.</em></h2></div>
-            <p>Four areas of support, shaped around your next step.</p>
+            <div><p class="section-index"><span data-i18n="servicesIndex">02 / WHAT WE DO</span> <span class="index-rule" aria-hidden="true"></span></p><h2 id="services-title" data-reveal><span data-i18n="servicesTitle1">Different needs.</span><br><em data-i18n="servicesTitle2">Considered support.</em></h2></div>
+            <p data-i18n="servicesLead">Four areas of support, shaped around your next step.</p>
           </div>
 
           <div class="service-grid">
             <article class="service-card service-card-business" id="business" aria-labelledby="business-title">
-              <div class="service-card-photo" data-reveal="image"><img src="assets/business-executive.jpg" alt="Business leaders discussing strategy in an executive meeting" width="1672" height="941" loading="lazy"></div>
+              <div class="service-card-photo" data-reveal="image"><img src="assets/business-executive.jpg" alt="Business leaders discussing strategy in an executive meeting" data-i18n-alt="businessAlt" width="1672" height="941" loading="lazy"></div>
               <div class="service-card-body">
                 <p class="service-number">01 <span aria-hidden="true"></span></p>
-                <h3 id="business-title" data-reveal>Business consultancy</h3>
-                <p class="service-intro">Practical help with setting up and running your business.</p>
-                <ul><li>Company incorporation assistance</li><li>Accounting and tax document support</li><li>Employment, social and health insurance registration</li><li>Employee-card application assistance</li><li>VAT-return assistance through an associate</li></ul>
-                <a class="service-link" href="mailto:fuhrand@xyz.com?subject=Business%20consultancy%20enquiry">Ask about business support <span aria-hidden="true">&nearr;</span></a>
+                <h3 id="business-title" data-reveal data-i18n="serviceBusiness">Business consultancy</h3>
+                <p class="service-intro" data-i18n="businessIntro">Practical help with setting up and running your business.</p>
+                <ul><li data-i18n="business1">Company incorporation assistance</li><li data-i18n="business2">Accounting and tax document support</li><li data-i18n="business3">Employment, social and health insurance registration</li><li data-i18n="business4">Employee-card application assistance</li><li data-i18n="business5">VAT-return assistance through an associate</li></ul>
+                <a class="service-link" href="#contact" data-topic="business"><span data-i18n="businessLink">Ask about business support</span> <span aria-hidden="true">&nearr;</span></a>
               </div>
             </article>
 
             <article class="service-card service-card-marketing" id="marketing" aria-labelledby="marketing-title">
-              <div class="service-card-photo" data-reveal="image"><img src="assets/digital-strategy.jpg" alt="Marketing strategist and business owner reviewing campaign performance and conversions" width="1672" height="941" loading="lazy"></div>
+              <div class="service-card-photo" data-reveal="image"><img src="assets/digital-strategy.jpg" alt="Marketing strategist and business owner reviewing campaign performance and conversions" data-i18n-alt="marketingAlt" width="1672" height="941" loading="lazy"></div>
               <div class="service-card-body">
                 <p class="service-number">02 <span aria-hidden="true"></span></p>
-                <h3 id="marketing-title" data-reveal>Digital marketing</h3>
-                <p class="service-intro">A considered presence, shaped around your goals.</p>
-                <ul><li>Planning and budgeting using your business history</li><li>Platform setup and ongoing management</li><li>Monthly reporting on marketing and sales impact</li><li>Recommendations for improvement</li><li>Monthly and annual support options</li></ul>
-                <a class="service-link" href="mailto:fuhrand@xyz.com?subject=Digital%20marketing%20enquiry">Ask about digital marketing <span aria-hidden="true">&nearr;</span></a>
+                <h3 id="marketing-title" data-reveal data-i18n="serviceMarketing">Digital marketing</h3>
+                <p class="service-intro" data-i18n="marketingIntro">A considered presence, shaped around your goals.</p>
+                <ul><li data-i18n="marketing1">Planning and budgeting using your business history</li><li data-i18n="marketing2">Platform setup and ongoing management</li><li data-i18n="marketing3">Monthly reporting on marketing and sales impact</li><li data-i18n="marketing4">Recommendations for improvement</li><li data-i18n="marketing5">Monthly and annual support options</li></ul>
+                <a class="service-link" href="#contact" data-topic="marketing"><span data-i18n="marketingLink">Ask about digital marketing</span> <span aria-hidden="true">&nearr;</span></a>
               </div>
             </article>
 
             <article class="service-card service-card-expat" id="expat" aria-labelledby="expat-title">
-              <div class="service-card-photo" data-reveal="image"><img src="assets/expat-guidance-v2.jpg" alt="Advisor helping two newcomers navigate a city map and relocation documents" width="1672" height="941" loading="lazy"></div>
+              <div class="service-card-photo" data-reveal="image"><img src="assets/expat-guidance-v2.jpg" alt="Advisor helping two newcomers navigate a city map and relocation documents" data-i18n-alt="expatAlt" width="1672" height="941" loading="lazy"></div>
               <div class="service-card-body">
                 <p class="service-number">03 <span aria-hidden="true"></span></p>
-                <h3 id="expat-title" data-reveal>Expat services</h3>
-                <p class="service-intro">Support with the practical details of a new chapter.</p>
-                <ul><li>Residence-permit application support</li><li>Translation assistance</li><li>Trade-licence assistance</li><li>Driving-licence assistance</li><li>Permanent-residence document preparation and verification</li><li>Accommodation coordination</li></ul>
-                <a class="service-link" href="mailto:fuhrand@xyz.com?subject=Expat%20services%20enquiry">Ask about expat support <span aria-hidden="true">&nearr;</span></a>
+                <h3 id="expat-title" data-reveal data-i18n="serviceExpat">Expat services</h3>
+                <p class="service-intro" data-i18n="expatIntro">Support with the practical details of a new chapter.</p>
+                <ul><li data-i18n="expat1">Residence-permit application support</li><li data-i18n="expat2">Translation assistance</li><li data-i18n="expat3">Trade-licence assistance</li><li data-i18n="expat4">Driving-licence assistance</li><li data-i18n="expat5">Permanent-residence document preparation and verification</li><li data-i18n="expat6">Accommodation coordination</li></ul>
+                <a class="service-link" href="#contact" data-topic="expat"><span data-i18n="expatLink">Ask about expat support</span> <span aria-hidden="true">&nearr;</span></a>
               </div>
             </article>
 
             <article class="service-card service-card-accommodation" id="accommodation" aria-labelledby="accommodation-title">
-              <div class="service-card-photo" data-reveal="image"><img src="assets/accommodation.jpg" alt="Bright furnished bedroom, illustrative of accommodation support" width="1400" height="933" loading="lazy"></div>
+              <div class="service-card-photo" data-reveal="image"><img src="assets/accommodation.jpg" alt="Bright furnished bedroom, illustrative of accommodation support" data-i18n-alt="accommodationAlt" width="1400" height="933" loading="lazy"></div>
               <div class="service-card-body">
                 <p class="service-number">04 <span aria-hidden="true"></span></p>
-                <h3 id="accommodation-title" data-reveal>Accommodation</h3>
-                <p class="service-intro">A place that works for your life and budget.</p>
-                <ul><li>Long-term apartments and rooms</li><li>Search based on your budget and needs</li><li>Residence-registration document assistance</li></ul>
-                <a class="service-link" href="mailto:fuhrand@xyz.com?subject=Accommodation%20enquiry">Ask about accommodation <span aria-hidden="true">&nearr;</span></a>
+                <h3 id="accommodation-title" data-reveal data-i18n="serviceAccommodation">Accommodation</h3>
+                <p class="service-intro" data-i18n="accommodationIntro">A place that works for your life and budget.</p>
+                <ul><li data-i18n="accommodation1">Long-term apartments and rooms</li><li data-i18n="accommodation2">Search based on your budget and needs</li><li data-i18n="accommodation3">Residence-registration document assistance</li></ul>
+                <a class="service-link" href="#contact" data-topic="accommodation"><span data-i18n="accommodationLink">Ask about accommodation</span> <span aria-hidden="true">&nearr;</span></a>
               </div>
             </article>
           </div>
-          <p class="service-note">We provide administrative and coordination assistance. Eligibility and official decisions remain with the relevant authorities; specialist advice may be coordinated with qualified associates where applicable.</p>
+          <p class="service-note" data-i18n="serviceNote">We provide administrative and coordination assistance. Eligibility and official decisions remain with the relevant authorities; specialist advice may be coordinated with qualified associates where applicable.</p>
         </div>
       </section>
 
       <section class="approach section-pad" id="approach" aria-labelledby="approach-title">
         <div class="wrap approach-grid">
-          <div class="approach-heading"><p class="section-index">03 / HOW WE THINK <span class="index-rule" aria-hidden="true"></span></p><h2 id="approach-title" data-reveal>Clarity at every<br><em>turn.</em></h2><p>Every situation is different. We begin by understanding your next step and making the process easier to follow.</p></div>
+          <div class="approach-heading"><p class="section-index"><span data-i18n="approachIndex">03 / HOW WE THINK</span> <span class="index-rule" aria-hidden="true"></span></p><h2 id="approach-title" data-reveal><span data-i18n="approachTitle1">Clarity at every</span><br><em data-i18n="approachTitle2">turn.</em></h2><p data-i18n="approachLead">Every situation is different. We begin by understanding your next step and making the process easier to follow.</p></div>
           <div class="approach-steps">
-            <div class="approach-step" data-reveal="row"><span>01 / UNDERSTAND</span><div><h3>Start with your situation</h3><p>Identify the documents, decisions and practical needs behind your goal.</p></div></div>
-            <div class="approach-step" data-reveal="row" data-delay="1"><span>02 / COORDINATE</span><div><h3>Bring the details together</h3><p>Keep tasks, people and requirements in view as the work progresses.</p></div></div>
-            <div class="approach-step" data-reveal="row" data-delay="2"><span>03 / MOVE FORWARD</span><div><h3>Stay focused on progress</h3><p>Make the next action clear, so your time stays with your business and life.</p></div></div>
+            <div class="approach-step" data-reveal="row"><span data-i18n="step1Index">01 / UNDERSTAND</span><div><h3 data-i18n="step1Title">Start with your situation</h3><p data-i18n="step1Body">Identify the documents, decisions and practical needs behind your goal.</p></div></div>
+            <div class="approach-step" data-reveal="row" data-delay="1"><span data-i18n="step2Index">02 / COORDINATE</span><div><h3 data-i18n="step2Title">Bring the details together</h3><p data-i18n="step2Body">Keep tasks, people and requirements in view as the work progresses.</p></div></div>
+            <div class="approach-step" data-reveal="row" data-delay="2"><span data-i18n="step3Index">03 / MOVE FORWARD</span><div><h3 data-i18n="step3Title">Stay focused on progress</h3><p data-i18n="step3Body">Make the next action clear, so your time stays with your business and life.</p></div></div>
           </div>
           <img class="approach-watermark" src="assets/fuhrend-mark.svg" alt="" aria-hidden="true" width="180" height="135">
         </div>
       </section>
 
-      <section class="question-band" id="contact" aria-labelledby="question-title"><div class="wrap question-inner"><div><h2 id="question-title">Not sure where to begin?</h2><p>Tell us what you're planning. We'll help identify the relevant support.</p></div><a class="button button-outline" href="mailto:fuhrand@xyz.com?subject=Question%20for%20Fuhrend%20Management">Ask us a question <span aria-hidden="true">&nearr;</span></a></div></section>
+      <section class="enquiry section-pad" id="contact" aria-labelledby="question-title">
+        <div class="wrap enquiry-layout">
+          <div class="enquiry-intro">
+            <p class="section-index"><span data-i18n="contactIndex">04 / GET IN TOUCH</span> <span class="index-rule" aria-hidden="true"></span></p>
+            <h2 id="question-title" data-reveal data-i18n="questionTitle">Not sure where to begin?</h2>
+            <p class="enquiry-lead" data-i18n="questionBody">Tell us what you're planning. We'll help identify the relevant support.</p>
+            <a class="enquiry-email" href="mailto:fuhrand@xyz.com?subject=Question%20for%20Fuhrend%20Management" data-mail-subject="questionSubject"><span data-i18n="contactEmail">Prefer email? Write to us</span> <span aria-hidden="true">&nearr;</span></a>
+            <p class="enquiry-address">fuhrand@xyz.com</p>
+          </div>
+          <form class="enquiry-form" id="enquiry-form" action="mailto:fuhrand@xyz.com" method="post" enctype="text/plain" aria-labelledby="enquiry-title">
+            <div class="enquiry-form-heading">
+              <h3 id="enquiry-title" data-i18n="enquiryTitle">Send an enquiry</h3>
+              <p data-i18n="enquiryIntro">A few details will help us understand your question.</p>
+            </div>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="enquiry-name"><span data-i18n="fieldName">Full name</span> <span class="required-mark" aria-hidden="true">*</span></label>
+                <input id="enquiry-name" name="name" type="text" autocomplete="name" maxlength="120" required placeholder="Your full name" data-i18n-placeholder="placeholderName">
+              </div>
+              <div class="form-field">
+                <label for="enquiry-email"><span data-i18n="fieldEmail">Email address</span> <span class="required-mark" aria-hidden="true">*</span></label>
+                <input id="enquiry-email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com" data-i18n-placeholder="placeholderEmail">
+              </div>
+              <div class="form-field form-field-wide">
+                <label for="enquiry-topic"><span data-i18n="fieldTopic">What can we help you with?</span> <span class="required-mark" aria-hidden="true">*</span></label>
+                <select id="enquiry-topic" name="topic" required>
+                  <option value="" data-i18n="topicPrompt" selected disabled>Select a service</option>
+                  <option value="business" data-i18n="serviceBusiness">Business consultancy</option>
+                  <option value="marketing" data-i18n="serviceMarketing">Digital marketing</option>
+                  <option value="expat" data-i18n="serviceExpat">Expat services</option>
+                  <option value="accommodation" data-i18n="serviceAccommodation">Accommodation</option>
+                  <option value="general" data-i18n="topicGeneral">General enquiry</option>
+                </select>
+              </div>
+              <div class="form-field form-field-wide">
+                <label for="enquiry-phone" data-i18n="fieldPhone">Phone / WhatsApp (optional)</label>
+                <input id="enquiry-phone" name="phone" type="tel" autocomplete="tel" maxlength="40" placeholder="Include your country code" data-i18n-placeholder="placeholderPhone">
+              </div>
+              <div class="form-field form-field-wide">
+                <label for="enquiry-message"><span data-i18n="fieldMessage">Your message</span> <span class="required-mark" aria-hidden="true">*</span></label>
+                <textarea id="enquiry-message" name="message" rows="5" maxlength="1200" required placeholder="Tell us a little about what you need" data-i18n-placeholder="placeholderMessage" aria-describedby="enquiry-caution"></textarea>
+              </div>
+            </div>
+            <p class="form-caution" id="enquiry-caution" data-i18n="enquiryCaution">Please do not include passport numbers or sensitive documents.</p>
+            <button class="button button-dark enquiry-submit" type="submit"><span data-i18n="enquirySubmit">Continue by email</span> <span aria-hidden="true">&nearr;</span></button>
+            <p class="form-note" data-i18n="enquiryNote">This opens a draft in your email app. Nothing is sent automatically.</p>
+            <p class="form-status" id="enquiry-status" role="status" aria-live="polite" hidden></p>
+          </form>
+        </div>
+      </section>
 
-      <section class="closing" aria-labelledby="closing-title"><div class="wrap closing-inner"><p class="section-index">A CLEARER NEXT STEP</p><h2 id="closing-title" data-reveal>Good things begin<br>with <em>getting oriented.</em></h2><p>Explore the support available for your business, your move or your next stage of growth.</p><a class="button button-dark" href="mailto:fuhrand@xyz.com?subject=Fuhrend%20Management%20consultation">Start a conversation <span aria-hidden="true">&nearr;</span></a><a class="closing-secondary" href="#services">Explore all services</a></div></section>
+      <section class="closing" aria-labelledby="closing-title"><div class="wrap closing-inner"><p class="section-index" data-i18n="closingIndex">A CLEARER NEXT STEP</p><h2 id="closing-title" data-reveal><span data-i18n="closingTitle1">Good things begin</span><br><span data-i18n="closingTitle2">with </span><em data-i18n="closingTitle3">getting oriented.</em></h2><p data-i18n="closingBody">Explore the support available for your business, your move or your next stage of growth.</p><a class="button button-dark" href="#contact"><span data-i18n="closingLink">Start a conversation</span> <span aria-hidden="true">&nearr;</span></a><a class="closing-secondary" href="#services" data-i18n="closingSecondary">Explore all services</a></div></section>
     </main>
 
-    <footer class="site-footer"><div class="wrap footer-main"><div class="footer-identity"><div class="footer-brand"><img src="assets/fuhrend-mark.svg" alt="" width="42" height="42"><span>FUHREND<span class="footer-dot">.</span></span></div><p>Management s.r.o.<br>Focused on business. Thoughtful about life.</p></div><div class="footer-links"><span>EXPLORE</span><a href="#services">Services</a><a href="#approach">Our approach</a><a href="#about">About us</a><a href="#contact">Contact</a></div><div class="footer-contact"><span>GET IN TOUCH</span><a href="mailto:fuhrand@xyz.com">fuhrand@xyz.com</a><p class="contact-placeholder">+12 123456</p></div></div><div class="wrap footer-bottom"><span>&copy; <span id="year">2026</span> Fuhrend Management s.r.o.</span><a href="#top">Back to top &uarr;</a></div></footer>
+    <footer class="site-footer"><div class="wrap footer-main"><div class="footer-identity"><div class="footer-brand"><img src="assets/fuhrend-mark.svg" alt="" width="42" height="42"><span>FUHREND<span class="footer-dot">.</span></span></div><p><span>Management s.r.o.</span><br><span data-i18n="footerTagline">Focused on business. Thoughtful about life.</span></p></div><div class="footer-links"><span data-i18n="footerExplore">EXPLORE</span><a href="#services" data-i18n="navServices">Services</a><a href="#approach" data-i18n="navApproach">Our approach</a><a href="#about" data-i18n="navAbout">About us</a><a href="#contact" data-i18n="navContact">Contact</a></div><div class="footer-contact"><span data-i18n="footerTouch">GET IN TOUCH</span><a href="mailto:fuhrand@xyz.com">fuhrand@xyz.com</a><p class="contact-placeholder">+12 123456</p></div></div><div class="wrap footer-bottom"><span>&copy; <span id="year">2026</span> Fuhrend Management s.r.o.</span><a href="#top"><span data-i18n="footerBack">Back to top</span> &uarr;</a></div></footer>
   </body>
 </html>
