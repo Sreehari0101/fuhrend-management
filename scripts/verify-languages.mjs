@@ -74,6 +74,7 @@ try {
     return Object.entries(translations).flatMap(([locale, copy]) => keys.filter((key) => !copy[key]).map((key) => locale + ':' + key));
   })()`);
   if (missingCopy.length) throw new Error(`Missing translations: ${missingCopy.join(', ')}`);
+  const hasConfiguredKey = await evaluate('hasWeb3FormsKey()');
 
   for (const width of [1440, 1101, 1100, 1001, 768, 390, 320]) {
     await send('Emulation.setDeviceMetricsOverride', { width, height: 844, deviceScaleFactor: 1, mobile: width < 500 });
@@ -117,7 +118,7 @@ try {
     console.log(locale, JSON.stringify(state));
     if (state.lang !== locale || state.stored !== locale) throw new Error(`${locale} selection failed`);
     const copy = await evaluate(`translations['${locale}']`);
-    if (state.formHeading !== copy.enquiryTitle || state.namePlaceholder !== copy.placeholderName || state.topicOptions[1] !== copy.serviceBusiness || state.formNote !== copy.enquiryNote) throw new Error(`${locale} form translation failed`);
+    if (state.formHeading !== copy.enquiryTitle || state.namePlaceholder !== copy.placeholderName || state.topicOptions[1] !== copy.serviceBusiness || state.formNote !== copy[hasConfiguredKey ? 'enquiryOnlineNote' : 'enquiryNote']) throw new Error(`${locale} form translation failed`);
     if (state.software !== copy.serviceSoftware || state.wayfinders !== 5 || state.cards !== 5 || !state.productOpen || state.productText.some((value) => value !== copy.softwareSoon) || !state.topicOptions.includes(copy.topicSoftware)) throw new Error(`${locale} software service failed`);
     await evaluate("document.querySelectorAll('.software-product').forEach((product) => { product.open = false; })");
     await send('Emulation.setDeviceMetricsOverride', { width: 320, height: 844, deviceScaleFactor: 1, mobile: true });
@@ -195,11 +196,17 @@ try {
     const buttonBefore = form.querySelector('.enquiry-submit [data-i18n]').textContent;
     form.requestSubmit();
     await new Promise((resolve) => setTimeout(resolve, 0));
-    return { request, buttonBefore, status: document.querySelector('#enquiry-status').textContent, state: document.querySelector('#enquiry-status').dataset.state, cleared: !form.elements.name.value, note: document.querySelector('.form-note').textContent };
+    const dialog = document.querySelector('#enquiry-dialog');
+    return { request, buttonBefore, status: document.querySelector('#enquiry-status').textContent, state: document.querySelector('#enquiry-status').dataset.state, cleared: !form.elements.name.value, note: document.querySelector('.form-note').textContent, dialogOpen: dialog.open, dialogState: dialog.dataset.state, dialogTitle: dialog.querySelector('h2').textContent, emailHidden: dialog.querySelector('.enquiry-dialog-email').hidden };
   })()`);
-  if (onlineFlow.buttonBefore !== 'Send enquiry' || onlineFlow.request?.url !== 'https://api.web3forms.com/submit' || onlineFlow.request.method !== 'POST' || onlineFlow.request.data.access_key !== 'test-access-key' || onlineFlow.request.data.subject !== 'Software solutions enquiry' || onlineFlow.request.data.name !== 'Test Visitor' || onlineFlow.status !== 'Thank you. Your enquiry has been sent. We will reply by email.' || onlineFlow.state !== 'success' || !onlineFlow.cleared || !onlineFlow.note.includes('Web3Forms')) throw new Error('Web3Forms success flow failed');
+  if (onlineFlow.buttonBefore !== 'Send enquiry' || onlineFlow.request?.url !== 'https://api.web3forms.com/submit' || onlineFlow.request.method !== 'POST' || onlineFlow.request.data.access_key !== 'test-access-key' || onlineFlow.request.data.subject !== 'Software solutions enquiry' || onlineFlow.request.data.name !== 'Test Visitor' || onlineFlow.status !== 'Thank you. Your enquiry has been sent. We will reply by email.' || onlineFlow.state !== 'success' || !onlineFlow.cleared || !onlineFlow.note.includes('Web3Forms') || !onlineFlow.dialogOpen || onlineFlow.dialogState !== 'success' || onlineFlow.dialogTitle !== 'Thank you for getting in touch.' || !onlineFlow.emailHidden) throw new Error('Web3Forms success flow failed');
+  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+  await delay(300);
+  const successShot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+  await writeFile('/tmp/fuhrend-enquiry-success-mobile.png', Buffer.from(successShot.data, 'base64'));
 
   const failedFlow = await evaluate(`(async () => {
+    document.querySelector('#enquiry-dialog').close();
     const form = document.querySelector('#enquiry-form');
     form.elements.name.value = 'Retry Visitor';
     form.elements.email.value = 'retry@example.com';
@@ -208,23 +215,47 @@ try {
     window.fetch = async () => ({ ok: false, status: 429, json: async () => ({ success: false }) });
     form.requestSubmit();
     await new Promise((resolve) => setTimeout(resolve, 0));
-    const limited = { state: document.querySelector('#enquiry-status').dataset.state, text: document.querySelector('#enquiry-status').textContent, retained: form.elements.name.value === 'Retry Visitor' };
+    const dialog = document.querySelector('#enquiry-dialog');
+    const limited = { state: document.querySelector('#enquiry-status').dataset.state, text: document.querySelector('#enquiry-status').textContent, retained: form.elements.name.value === 'Retry Visitor', open: dialog.open, title: dialog.querySelector('h2').textContent, body: dialog.querySelector('.enquiry-dialog-body').textContent, emailHref: dialog.querySelector('.enquiry-dialog-email').href, emailVisible: !dialog.querySelector('.enquiry-dialog-email').hidden };
+    dialog.close();
     window.fetch = async () => { throw new TypeError('Network unavailable'); };
     form.requestSubmit();
     await new Promise((resolve) => setTimeout(resolve, 0));
-    return { limited, network: document.querySelector('#enquiry-status').textContent, enabled: !form.querySelector('.enquiry-submit').disabled, retained: form.elements.name.value === 'Retry Visitor' };
+    return { limited, network: document.querySelector('#enquiry-status').textContent, enabled: !form.querySelector('.enquiry-submit').disabled, retained: form.elements.name.value === 'Retry Visitor', dialogOpen: dialog.open, dialogBody: dialog.querySelector('.enquiry-dialog-body').textContent };
   })()`);
-  if (failedFlow.limited.state !== 'error' || !failedFlow.limited.text.includes('Too many requests') || !failedFlow.limited.retained || !failedFlow.network.includes('could not be sent') || !failedFlow.enabled || !failedFlow.retained) throw new Error('Web3Forms failure flow failed');
+  if (failedFlow.limited.state !== 'error' || !failedFlow.limited.text.includes('Too many requests') || !failedFlow.limited.retained || !failedFlow.limited.open || !failedFlow.limited.title.includes("couldn't send") || !failedFlow.limited.body.includes('request limit') || !failedFlow.limited.emailVisible || !decodeURIComponent(failedFlow.limited.emailHref).includes('Retry Visitor') || !failedFlow.network.includes('could not be sent') || !failedFlow.enabled || !failedFlow.retained || !failedFlow.dialogOpen || !failedFlow.dialogBody.includes('trouble sending')) throw new Error('Web3Forms failure flow failed');
+  await delay(300);
+  const errorShot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+  await writeFile('/tmp/fuhrend-enquiry-error-mobile.png', Buffer.from(errorShot.data, 'base64'));
   for (const locale of ['cs-CZ', 'ru-RU', 'de-DE', 'en-GB']) {
     await send('Emulation.setDeviceMetricsOverride', { width: 320, height: 844, deviceScaleFactor: 1, mobile: true });
     const translatedOnline = await evaluate(`(() => {
       applyLanguage('${locale}');
       const button = document.querySelector('.enquiry-submit');
-      return { button: button.querySelector('[data-i18n]').textContent, note: document.querySelector('.form-note').textContent, status: document.querySelector('#enquiry-status').textContent, scrollWidth: document.documentElement.scrollWidth, viewport: innerWidth, buttonWidth: button.clientWidth, buttonContentWidth: button.scrollWidth };
+      const dialog = document.querySelector('#enquiry-dialog');
+      const bounds = dialog.getBoundingClientRect();
+      return { button: button.querySelector('[data-i18n]').textContent, note: document.querySelector('.form-note').textContent, status: document.querySelector('#enquiry-status').textContent, scrollWidth: document.documentElement.scrollWidth, viewport: innerWidth, buttonWidth: button.clientWidth, buttonContentWidth: button.scrollWidth, dialogTitle: dialog.querySelector('h2').textContent, dialogBody: dialog.querySelector('.enquiry-dialog-body').textContent, dialogLeft: bounds.left, dialogRight: bounds.right, dialogScrollWidth: dialog.scrollWidth, dialogWidth: dialog.clientWidth };
     })()`);
     const copy = await evaluate(`translations['${locale}']`);
-    if (translatedOnline.button !== copy.enquirySend || translatedOnline.note !== copy.enquiryOnlineNote || translatedOnline.status !== copy.enquiryError || translatedOnline.scrollWidth > translatedOnline.viewport + 1 || translatedOnline.buttonContentWidth > translatedOnline.buttonWidth) throw new Error(`${locale} Web3Forms translation or mobile layout failed`);
+    if (translatedOnline.button !== copy.enquirySend || translatedOnline.note !== copy.enquiryOnlineNote || translatedOnline.status !== copy.enquiryError || translatedOnline.dialogTitle !== copy.enquiryDialogErrorTitle || translatedOnline.dialogBody !== copy.enquiryDialogErrorBody || translatedOnline.scrollWidth > translatedOnline.viewport + 1 || translatedOnline.buttonContentWidth > translatedOnline.buttonWidth || translatedOnline.dialogLeft < 0 || translatedOnline.dialogRight > translatedOnline.viewport || translatedOnline.dialogScrollWidth > translatedOnline.dialogWidth + 1) throw new Error(`${locale} Web3Forms translation or mobile layout failed`);
   }
+  for (const width of [768, 1440]) {
+    await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    const dialogLayout = await evaluate(`(() => {
+      const dialog = document.querySelector('#enquiry-dialog');
+      const rect = dialog.getBoundingClientRect();
+      return { viewport: innerWidth, left: rect.left, right: rect.right, scrollWidth: dialog.scrollWidth, width: dialog.clientWidth };
+    })()`);
+    if (dialogLayout.left < 0 || dialogLayout.right > dialogLayout.viewport || dialogLayout.scrollWidth > dialogLayout.width + 1) throw new Error(`${width}px enquiry dialog overflow`);
+  }
+  const errorDesktopShot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+  await writeFile('/tmp/fuhrend-enquiry-error-desktop.png', Buffer.from(errorDesktopShot.data, 'base64'));
+  const dialogClosed = await evaluate(`(async () => {
+    document.querySelector('.enquiry-dialog-dismiss').click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    return { closed: !document.querySelector('#enquiry-dialog').open, focusReturned: document.activeElement === document.querySelector('.enquiry-submit'), focusTag: document.activeElement?.tagName, focusClass: document.activeElement?.className };
+  })()`);
+  if (!dialogClosed.closed || !dialogClosed.focusReturned) throw new Error(`Enquiry dialog dismissal failed: ${JSON.stringify(dialogClosed)}`);
   console.log('Web3Forms success, rate limit and network failure', 'OK');
 
   await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });

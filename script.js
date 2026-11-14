@@ -130,6 +130,9 @@ const enquiryForm = document.getElementById('enquiry-form');
 const enquiryTopic = document.getElementById('enquiry-topic');
 const enquiryStatus = document.getElementById('enquiry-status');
 const enquirySubmit = enquiryForm.querySelector('.enquiry-submit');
+const enquiryDialog = document.getElementById('enquiry-dialog');
+const enquiryDialogEmail = enquiryDialog.querySelector('.enquiry-dialog-email');
+const enquiryDialogDismiss = enquiryDialog.querySelector('.enquiry-dialog-dismiss');
 const enquirySubjectKeys = {
   business: 'businessSubject', marketing: 'marketingSubject',
   expat: 'expatSubject', accommodation: 'accommodationSubject',
@@ -165,6 +168,36 @@ function showEnquiryStatus(key, state) {
   enquiryStatus.hidden = false;
 }
 
+function showEnquiryDialog(outcome) {
+  const success = outcome === 'success';
+  enquiryDialog.dataset.state = success ? 'success' : 'error';
+  enquiryDialog.querySelector('.enquiry-dialog-kicker').dataset.i18n = success ? 'enquiryDialogSuccessKicker' : 'enquiryDialogErrorKicker';
+  enquiryDialog.querySelector('#enquiry-dialog-title').dataset.i18n = success ? 'enquiryDialogSuccessTitle' : 'enquiryDialogErrorTitle';
+  enquiryDialog.querySelector('#enquiry-dialog-body').dataset.i18n = success ? 'enquiryDialogSuccessBody' : outcome === 'rate-limit' ? 'enquiryDialogRateBody' : 'enquiryDialogErrorBody';
+  enquiryDialogDismiss.dataset.i18n = success ? 'enquiryDialogDone' : 'enquiryDialogReturn';
+  enquiryDialogDismiss.classList.toggle('button-dark', success);
+  enquiryDialogDismiss.classList.toggle('button-outline', !success);
+  enquiryDialogEmail.hidden = success;
+  if (!success) enquiryDialogEmail.href = buildEnquiryMailto(new FormData(enquiryForm), document.documentElement.lang);
+  applyLanguage(document.documentElement.lang);
+  if (typeof enquiryDialog.showModal === 'function') {
+    enquiryDialog.showModal();
+    enquiryDialog.querySelector('.enquiry-dialog-close').focus();
+  }
+}
+
+function closeEnquiryDialog() {
+  enquiryDialog.close();
+  enquirySubmit.focus();
+}
+
+enquiryDialog.querySelector('.enquiry-dialog-close').addEventListener('click', closeEnquiryDialog);
+enquiryDialogDismiss.addEventListener('click', closeEnquiryDialog);
+enquiryDialog.addEventListener('click', (event) => {
+  if (event.target === enquiryDialog) closeEnquiryDialog();
+});
+enquiryDialog.addEventListener('close', () => enquirySubmit.focus());
+
 enquiryForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (enquirySubmitting || !enquiryForm.reportValidity()) return;
@@ -186,6 +219,7 @@ enquiryForm.addEventListener('submit', async (event) => {
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
+  let outcome = 'error';
   try {
     const response = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
@@ -193,15 +227,13 @@ enquiryForm.addEventListener('submit', async (event) => {
       body: JSON.stringify(data),
       signal: controller.signal
     });
-    const result = await response.json();
-    if (response.ok && result.success === true) {
-      enquiryForm.reset();
-      showEnquiryStatus('enquirySuccess', 'success');
-    } else {
-      showEnquiryStatus(response.status === 429 ? 'enquiryRateLimit' : 'enquiryError', 'error');
+    if (response.status === 429) outcome = 'rate-limit';
+    else if (response.ok) {
+      const result = await response.json();
+      if (result.success === true) outcome = 'success';
     }
   } catch {
-    showEnquiryStatus('enquiryError', 'error');
+    // Network and invalid-response errors use the same email fallback.
   } finally {
     clearTimeout(timeout);
     enquirySubmitting = false;
@@ -209,6 +241,9 @@ enquiryForm.addEventListener('submit', async (event) => {
     enquiryForm.removeAttribute('aria-busy');
     applyLanguage(document.documentElement.lang);
   }
+  if (outcome === 'success') enquiryForm.reset();
+  showEnquiryStatus(outcome === 'success' ? 'enquirySuccess' : outcome === 'rate-limit' ? 'enquiryRateLimit' : 'enquiryError', outcome === 'success' ? 'success' : 'error');
+  showEnquiryDialog(outcome);
 });
 
 const savedLocale = readPreference(languageKey);

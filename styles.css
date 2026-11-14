@@ -218,6 +218,34 @@ h1, h2, h3, p { overflow-wrap: break-word; }
 .form-status[data-state="error"] { border-color: #a94733; background: #fff2ed; color: #813b2e; }
 .enquiry-submit:disabled { cursor: wait; opacity: .7; }
 .form-status[hidden] { display: none; }
+.enquiry-dialog { width: min(100% - 32px, 520px); max-height: calc(100dvh - 32px); padding: 0; overflow-y: auto; border: 1px solid #d3ddd5; border-radius: 4px; background: #fff; color: var(--ink); box-shadow: 0 28px 80px rgba(5, 26, 23, .24); }
+.enquiry-dialog::backdrop { background: rgba(7, 29, 26, .68); }
+.enquiry-dialog-inner { padding: clamp(25px, 5vw, 38px); }
+.enquiry-dialog-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.enquiry-dialog-mark { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--sage); color: var(--deep); font-family: var(--sans); font-size: 26px; font-weight: 600; line-height: 1; }
+.dialog-error-mark { display: none; }
+.enquiry-dialog[data-state="error"] .enquiry-dialog-mark { background: #fff0eb; color: var(--accent); }
+.enquiry-dialog[data-state="error"] .dialog-success-mark { display: none; }
+.enquiry-dialog[data-state="error"] .dialog-error-mark { display: block; }
+.enquiry-dialog-close { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid var(--line); background: #fff; color: var(--ink); font-size: 26px; font-weight: 300; line-height: 1; cursor: pointer; }
+.enquiry-dialog-close:hover { background: var(--paper); }
+.enquiry-dialog-kicker { margin: 23px 0 9px; color: var(--accent); font-size: 11px; font-weight: 700; line-height: 1.4; }
+.enquiry-dialog h2 { margin: 0; font-family: var(--serif); font-size: clamp(29px, 4vw, 39px); font-weight: 400; line-height: 1.14; }
+.enquiry-dialog-body { margin: 15px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+.enquiry-dialog-actions { display: flex; gap: 10px; margin-top: 29px; }
+.enquiry-dialog-actions .button { min-width: 0; min-height: 48px; border: 1px solid var(--deep); cursor: pointer; text-align: center; }
+.enquiry-dialog-email { flex: 1; }
+.enquiry-dialog-email[hidden] { display: none; }
+.enquiry-dialog-dismiss { min-width: 125px; }
+.enquiry-dialog[data-state="success"] .enquiry-dialog-dismiss { margin-left: auto; }
+@media (max-width: 480px) {
+  .enquiry-dialog-actions { flex-direction: column; }
+  .enquiry-dialog-actions .button { width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .enquiry-dialog[open] .enquiry-dialog-inner { animation: enquiry-dialog-enter .22s ease-out both; }
+  @keyframes enquiry-dialog-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+}
 .closing { padding-block: 85px 78px; background: #e8f0e8; text-align: center; }
 .closing-inner { display: flex; flex-direction: column; align-items: center; }
 .closing h2 { margin-top: 10px; }
