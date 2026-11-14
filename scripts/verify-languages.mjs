@@ -68,6 +68,13 @@ try {
   })()`);
   console.log('unbound text', JSON.stringify(unboundText));
 
+  const missingCopy = await evaluate(`(() => {
+    const keys = [...document.querySelectorAll('[data-i18n], [data-i18n-alt], [data-i18n-aria], [data-i18n-placeholder]')]
+      .flatMap((element) => [element.dataset.i18n, element.dataset.i18nAlt, element.dataset.i18nAria, element.dataset.i18nPlaceholder].filter(Boolean));
+    return Object.entries(translations).flatMap(([locale, copy]) => keys.filter((key) => !copy[key]).map((key) => locale + ':' + key));
+  })()`);
+  if (missingCopy.length) throw new Error(`Missing translations: ${missingCopy.join(', ')}`);
+
   for (const width of [1440, 1101, 1100, 1001, 768, 390, 320]) {
     await send('Emulation.setDeviceMetricsOverride', { width, height: 844, deviceScaleFactor: 1, mobile: width < 500 });
     await delay(150);
@@ -84,6 +91,13 @@ try {
     if (width < 500 && layout.menuButton.right > layout.viewport) throw new Error(`${width}px menu button overflow`);
     const screenshot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
     await writeFile(`/tmp/fuhrend-${width}-language.png`, Buffer.from(screenshot.data, 'base64'));
+    if (width === 1440 || width === 768 || width === 390) {
+      await evaluate("document.querySelector('#software').scrollIntoView({ behavior: 'instant' })");
+      await delay(1000);
+      const softwareShot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+      await writeFile(`/tmp/fuhrend-software-${width}.png`, Buffer.from(softwareShot.data, 'base64'));
+      await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
+    }
     if (width === 768) {
       await evaluate("document.querySelector('#contact').scrollIntoView({ behavior: 'instant' })");
       await delay(150);
@@ -96,13 +110,18 @@ try {
   for (const locale of ['cs-CZ', 'ru-RU', 'de-DE', 'en-GB']) {
     const state = await evaluate(`(() => {
       document.querySelector('[data-language="${locale}"]').click();
-      return { lang: document.documentElement.lang, title: document.title, headline: document.querySelector('.hero-statement').innerText, service: document.querySelector('#business-title').innerText, choice: document.querySelector('.language-current').innerText, stored: localStorage.getItem('fuhrend-language'), formHeading: document.querySelector('#enquiry-title').innerText, namePlaceholder: document.querySelector('#enquiry-name').placeholder, topicOptions: [...document.querySelector('#enquiry-topic').options].map((option) => option.textContent), formNote: document.querySelector('.form-note').innerText };
+      const products = [...document.querySelectorAll('.software-product')];
+      products.forEach((product) => product.querySelector('summary').click());
+      return { lang: document.documentElement.lang, title: document.title, headline: document.querySelector('.hero-statement').innerText, service: document.querySelector('#business-title').innerText, software: document.querySelector('#software-title').innerText, wayfinders: document.querySelectorAll('.wayfinder-item').length, cards: document.querySelectorAll('.service-card').length, productOpen: products.every((product) => product.open), productText: products.map((product) => product.querySelector('p').textContent), choice: document.querySelector('.language-current').innerText, stored: localStorage.getItem('fuhrend-language'), formHeading: document.querySelector('#enquiry-title').innerText, namePlaceholder: document.querySelector('#enquiry-name').placeholder, topicOptions: [...document.querySelector('#enquiry-topic').options].map((option) => option.textContent), formNote: document.querySelector('.form-note').innerText };
     })()`);
     console.log(locale, JSON.stringify(state));
     if (state.lang !== locale || state.stored !== locale) throw new Error(`${locale} selection failed`);
     const copy = await evaluate(`translations['${locale}']`);
     if (state.formHeading !== copy.enquiryTitle || state.namePlaceholder !== copy.placeholderName || state.topicOptions[1] !== copy.serviceBusiness || state.formNote !== copy.enquiryNote) throw new Error(`${locale} form translation failed`);
+    if (state.software !== copy.serviceSoftware || state.wayfinders !== 5 || state.cards !== 5 || !state.productOpen || state.productText.some((value) => value !== copy.softwareSoon) || !state.topicOptions.includes(copy.topicSoftware)) throw new Error(`${locale} software service failed`);
+    await evaluate("document.querySelectorAll('.software-product').forEach((product) => { product.open = false; })");
     await send('Emulation.setDeviceMetricsOverride', { width: 320, height: 844, deviceScaleFactor: 1, mobile: true });
+    await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
     await delay(100);
     const mobileLayout = await evaluate(`(() => ({
       viewport: innerWidth,
@@ -154,6 +173,59 @@ try {
   const decodedMailto = decodeURIComponent(formFlow.href);
   if (!decodedMailto.includes('Test Visitor') || !decodedMailto.includes('Please tell me about the process.') || !decodedMailto.includes('Expat services')) throw new Error('Enquiry draft is incomplete');
   console.log('enquiry validation and draft', 'OK');
+  const softwareMailto = await evaluate(`(() => {
+    document.querySelector('a[data-topic="software"]').click();
+    return { selected: document.querySelector('#enquiry-topic').value, href: buildEnquiryMailto(new FormData(document.querySelector('#enquiry-form')), document.documentElement.lang) };
+  })()`);
+  if (softwareMailto.selected !== 'software' || !decodeURIComponent(softwareMailto.href).includes('Software solutions enquiry')) throw new Error('Software enquiry route failed');
+
+  const onlineFlow = await evaluate(`(async () => {
+    const form = document.querySelector('#enquiry-form');
+    form.elements.access_key.value = 'test-access-key';
+    form.elements.name.value = 'Test Visitor';
+    form.elements.email.value = 'visitor@example.com';
+    form.elements.topic.value = 'software';
+    form.elements.message.value = 'Please let me know when it is available.';
+    applyLanguage('en-GB');
+    let request;
+    window.fetch = async (url, options) => {
+      request = { url, method: options.method, headers: options.headers, data: JSON.parse(options.body) };
+      return { ok: true, status: 200, json: async () => ({ success: true }) };
+    };
+    const buttonBefore = form.querySelector('.enquiry-submit [data-i18n]').textContent;
+    form.requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    return { request, buttonBefore, status: document.querySelector('#enquiry-status').textContent, state: document.querySelector('#enquiry-status').dataset.state, cleared: !form.elements.name.value, note: document.querySelector('.form-note').textContent };
+  })()`);
+  if (onlineFlow.buttonBefore !== 'Send enquiry' || onlineFlow.request?.url !== 'https://api.web3forms.com/submit' || onlineFlow.request.method !== 'POST' || onlineFlow.request.data.access_key !== 'test-access-key' || onlineFlow.request.data.subject !== 'Software solutions enquiry' || onlineFlow.request.data.name !== 'Test Visitor' || onlineFlow.status !== 'Thank you. Your enquiry has been sent. We will reply by email.' || onlineFlow.state !== 'success' || !onlineFlow.cleared || !onlineFlow.note.includes('Web3Forms')) throw new Error('Web3Forms success flow failed');
+
+  const failedFlow = await evaluate(`(async () => {
+    const form = document.querySelector('#enquiry-form');
+    form.elements.name.value = 'Retry Visitor';
+    form.elements.email.value = 'retry@example.com';
+    form.elements.topic.value = 'general';
+    form.elements.message.value = 'Please contact me.';
+    window.fetch = async () => ({ ok: false, status: 429, json: async () => ({ success: false }) });
+    form.requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const limited = { state: document.querySelector('#enquiry-status').dataset.state, text: document.querySelector('#enquiry-status').textContent, retained: form.elements.name.value === 'Retry Visitor' };
+    window.fetch = async () => { throw new TypeError('Network unavailable'); };
+    form.requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    return { limited, network: document.querySelector('#enquiry-status').textContent, enabled: !form.querySelector('.enquiry-submit').disabled, retained: form.elements.name.value === 'Retry Visitor' };
+  })()`);
+  if (failedFlow.limited.state !== 'error' || !failedFlow.limited.text.includes('Too many requests') || !failedFlow.limited.retained || !failedFlow.network.includes('could not be sent') || !failedFlow.enabled || !failedFlow.retained) throw new Error('Web3Forms failure flow failed');
+  for (const locale of ['cs-CZ', 'ru-RU', 'de-DE', 'en-GB']) {
+    await send('Emulation.setDeviceMetricsOverride', { width: 320, height: 844, deviceScaleFactor: 1, mobile: true });
+    const translatedOnline = await evaluate(`(() => {
+      applyLanguage('${locale}');
+      const button = document.querySelector('.enquiry-submit');
+      return { button: button.querySelector('[data-i18n]').textContent, note: document.querySelector('.form-note').textContent, status: document.querySelector('#enquiry-status').textContent, scrollWidth: document.documentElement.scrollWidth, viewport: innerWidth, buttonWidth: button.clientWidth, buttonContentWidth: button.scrollWidth };
+    })()`);
+    const copy = await evaluate(`translations['${locale}']`);
+    if (translatedOnline.button !== copy.enquirySend || translatedOnline.note !== copy.enquiryOnlineNote || translatedOnline.status !== copy.enquiryError || translatedOnline.scrollWidth > translatedOnline.viewport + 1 || translatedOnline.buttonContentWidth > translatedOnline.buttonWidth) throw new Error(`${locale} Web3Forms translation or mobile layout failed`);
+  }
+  console.log('Web3Forms success, rate limit and network failure', 'OK');
 
   await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
   await evaluate("document.querySelector('#contact').scrollIntoView({ behavior: 'instant' })");

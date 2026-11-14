@@ -6,6 +6,12 @@ const languageOptions = document.querySelectorAll('.language-option');
 const languageKey = 'fuhrend-language';
 const languageSeenKey = 'fuhrend-language-menu-seen';
 const localeCodes = { en: 'en-GB', cs: 'cs-CZ', ru: 'ru-RU', de: 'de-DE' };
+let enquiryStatusKey = null;
+let enquirySubmitting = false;
+
+function hasWeb3FormsKey() {
+  return Boolean(document.querySelector('#enquiry-form [name="access_key"]')?.value.trim());
+}
 
 function readPreference(key) {
   try { return localStorage.getItem(key); } catch { return null; }
@@ -63,8 +69,11 @@ function applyLanguage(locale, remember = false) {
     option.setAttribute('aria-pressed', String(selected));
     option.classList.toggle('is-selected', selected);
   });
+  const online = hasWeb3FormsKey();
+  document.querySelector('.enquiry-submit [data-i18n]').textContent = copy[online ? (enquirySubmitting ? 'enquirySending' : 'enquirySend') : 'enquirySubmit'];
+  document.querySelector('.form-note').textContent = copy[online ? 'enquiryOnlineNote' : 'enquiryNote'];
   const enquiryStatus = document.getElementById('enquiry-status');
-  if (!enquiryStatus.hidden) enquiryStatus.textContent = copy.enquiryStatus;
+  if (enquiryStatusKey) enquiryStatus.textContent = copy[enquiryStatusKey];
   if (remember) savePreference(languageKey, locale);
 }
 
@@ -120,9 +129,11 @@ document.getElementById('year').textContent = String(new Date().getFullYear());
 const enquiryForm = document.getElementById('enquiry-form');
 const enquiryTopic = document.getElementById('enquiry-topic');
 const enquiryStatus = document.getElementById('enquiry-status');
+const enquirySubmit = enquiryForm.querySelector('.enquiry-submit');
 const enquirySubjectKeys = {
   business: 'businessSubject', marketing: 'marketingSubject',
-  expat: 'expatSubject', accommodation: 'accommodationSubject', general: 'generalSubject'
+  expat: 'expatSubject', accommodation: 'accommodationSubject',
+  software: 'softwareSubject', general: 'generalSubject'
 };
 
 document.querySelectorAll('a[data-topic]').forEach((link) => {
@@ -146,13 +157,58 @@ function buildEnquiryMailto(formData, locale) {
   return `mailto:fuhrand@xyz.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-enquiryForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  if (!enquiryForm.reportValidity()) return;
-  const locale = document.documentElement.lang;
-  enquiryStatus.textContent = translations[locale].enquiryStatus;
+function showEnquiryStatus(key, state) {
+  enquiryStatusKey = key;
+  enquiryStatus.textContent = translations[document.documentElement.lang][key];
+  enquiryStatus.dataset.state = state;
+  enquiryStatus.setAttribute('role', state === 'error' ? 'alert' : 'status');
   enquiryStatus.hidden = false;
-  window.location.href = buildEnquiryMailto(new FormData(enquiryForm), locale);
+}
+
+enquiryForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (enquirySubmitting || !enquiryForm.reportValidity()) return;
+  const locale = document.documentElement.lang;
+  if (!hasWeb3FormsKey()) {
+    showEnquiryStatus('enquiryStatus', 'info');
+    window.location.href = buildEnquiryMailto(new FormData(enquiryForm), locale);
+    return;
+  }
+
+  const data = Object.fromEntries(new FormData(enquiryForm));
+  data.subject = translations[locale][enquirySubjectKeys[data.topic] || 'generalSubject'];
+  data.topic = enquiryTopic.selectedOptions[0].textContent;
+  enquirySubmitting = true;
+  enquirySubmit.disabled = true;
+  enquiryForm.setAttribute('aria-busy', 'true');
+  showEnquiryStatus('enquirySending', 'info');
+  applyLanguage(locale);
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(data),
+      signal: controller.signal
+    });
+    const result = await response.json();
+    if (response.ok && result.success === true) {
+      enquiryForm.reset();
+      showEnquiryStatus('enquirySuccess', 'success');
+    } else {
+      showEnquiryStatus(response.status === 429 ? 'enquiryRateLimit' : 'enquiryError', 'error');
+    }
+  } catch {
+    showEnquiryStatus('enquiryError', 'error');
+  } finally {
+    clearTimeout(timeout);
+    enquirySubmitting = false;
+    enquirySubmit.disabled = false;
+    enquiryForm.removeAttribute('aria-busy');
+    applyLanguage(document.documentElement.lang);
+  }
 });
 
 const savedLocale = readPreference(languageKey);
