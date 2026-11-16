@@ -58,7 +58,7 @@ function applyLanguage(locale, remember = false) {
     element.placeholder = copy[element.dataset.i18nPlaceholder];
   });
   document.querySelectorAll('[data-mail-subject]').forEach((element) => {
-    element.href = `mailto:fuhrand@xyz.com?subject=${encodeURIComponent(copy[element.dataset.mailSubject])}`;
+    element.href = `mailto:office@fuhrend.eu?subject=${encodeURIComponent(copy[element.dataset.mailSubject])}`;
   });
 
   document.querySelector('.language-current').textContent = copy.languageCurrent;
@@ -157,7 +157,7 @@ function buildEnquiryMailto(formData, locale) {
     formData.get('phone') ? `${copy.fieldPhone}: ${formData.get('phone')}` : null,
     '', `${copy.fieldMessage}:`, formData.get('message')
   ].filter((line) => line !== null).join('\r\n');
-  return `mailto:fuhrand@xyz.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return `mailto:office@fuhrend.eu?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function showEnquiryStatus(key, state) {

@@ -170,7 +170,7 @@ try {
     const href = buildEnquiryMailto(new FormData(form), document.documentElement.lang);
     return { selected, invalid, valid, href };
   })()`);
-  if (formFlow.selected !== 'expat' || formFlow.invalid || !formFlow.valid || !formFlow.href.startsWith('mailto:fuhrand@xyz.com?')) throw new Error('Enquiry form flow failed');
+  if (formFlow.selected !== 'expat' || formFlow.invalid || !formFlow.valid || !formFlow.href.startsWith('mailto:office@fuhrend.eu?')) throw new Error('Enquiry form flow failed');
   const decodedMailto = decodeURIComponent(formFlow.href);
   if (!decodedMailto.includes('Test Visitor') || !decodedMailto.includes('Please tell me about the process.') || !decodedMailto.includes('Expat services')) throw new Error('Enquiry draft is incomplete');
   console.log('enquiry validation and draft', 'OK');
