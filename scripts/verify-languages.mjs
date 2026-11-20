@@ -84,14 +84,28 @@ try {
         const rect = document.querySelector(selector).getBoundingClientRect();
         return { left: Math.round(rect.left), right: Math.round(rect.right), top: Math.round(rect.top), bottom: Math.round(rect.bottom) };
       };
-      return { viewport: innerWidth, scrollWidth: document.documentElement.scrollWidth, brand: bounds('.brand'), language: bounds('.language-trigger'), menuButton: bounds('.menu-button'), menu: bounds('.language-menu'), menuVisible: !document.querySelector('.language-menu').hidden };
+      return { viewport: innerWidth, scrollWidth: document.documentElement.scrollWidth, brand: bounds('.brand'), language: bounds('.language-trigger'), menuButton: bounds('.menu-button'), menu: bounds('.language-menu'), menuVisible: !document.querySelector('.language-menu').hidden, whatsapp: bounds('.whatsapp-float'), whatsappHref: document.querySelector('.whatsapp-float').href, whatsappIconLoaded: document.querySelector('.whatsapp-float img').naturalWidth > 0 };
     })()`);
     console.log(width, JSON.stringify(layout));
     if (layout.scrollWidth > layout.viewport + 1) throw new Error(`${width}px horizontal overflow`);
     if (layout.language.right > layout.viewport || layout.brand.left < 0) throw new Error(`${width}px header overflow`);
+    if (layout.whatsapp.left < 0 || layout.whatsapp.right > layout.viewport || layout.whatsappHref !== 'https://wa.me/420776759252' || !layout.whatsappIconLoaded) throw new Error(`${width}px WhatsApp button failed`);
     if (width < 500 && layout.menuButton.right > layout.viewport) throw new Error(`${width}px menu button overflow`);
     const screenshot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
     await writeFile(`/tmp/fuhrend-${width}-language.png`, Buffer.from(screenshot.data, 'base64'));
+    if (width === 1440 || width === 320) {
+      await evaluate("window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })");
+      await delay(100);
+      const footerOverlap = await evaluate(`(() => {
+        const link = document.querySelector('.footer-bottom a').getBoundingClientRect();
+        const button = document.querySelector('.whatsapp-float').getBoundingClientRect();
+        return link.left < button.right && link.right > button.left && link.top < button.bottom && link.bottom > button.top;
+      })()`);
+      if (footerOverlap) throw new Error(`${width}px WhatsApp button covers footer link`);
+      const footerShot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+      await writeFile(`/tmp/fuhrend-footer-${width}.png`, Buffer.from(footerShot.data, 'base64'));
+      await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
+    }
     if (width === 1440 || width === 768 || width === 390) {
       await evaluate("document.querySelector('#software').scrollIntoView({ behavior: 'instant' })");
       await delay(1000);
@@ -113,11 +127,12 @@ try {
       document.querySelector('[data-language="${locale}"]').click();
       const products = [...document.querySelectorAll('.software-product')];
       products.forEach((product) => product.querySelector('summary').click());
-      return { lang: document.documentElement.lang, title: document.title, headline: document.querySelector('.hero-statement').innerText, service: document.querySelector('#business-title').innerText, software: document.querySelector('#software-title').innerText, wayfinders: document.querySelectorAll('.wayfinder-item').length, cards: document.querySelectorAll('.service-card').length, productOpen: products.every((product) => product.open), productText: products.map((product) => product.querySelector('p').textContent), choice: document.querySelector('.language-current').innerText, stored: localStorage.getItem('fuhrend-language'), formHeading: document.querySelector('#enquiry-title').innerText, namePlaceholder: document.querySelector('#enquiry-name').placeholder, topicOptions: [...document.querySelector('#enquiry-topic').options].map((option) => option.textContent), formNote: document.querySelector('.form-note').innerText };
+      return { lang: document.documentElement.lang, title: document.title, headline: document.querySelector('.hero-statement').innerText, service: document.querySelector('#business-title').innerText, software: document.querySelector('#software-title').innerText, wayfinders: document.querySelectorAll('.wayfinder-item').length, cards: document.querySelectorAll('.service-card').length, productOpen: products.every((product) => product.open), productText: products.map((product) => product.querySelector('p').textContent), choice: document.querySelector('.language-current').innerText, stored: localStorage.getItem('fuhrend-language'), formHeading: document.querySelector('#enquiry-title').innerText, namePlaceholder: document.querySelector('#enquiry-name').placeholder, topicOptions: [...document.querySelector('#enquiry-topic').options].map((option) => option.textContent), formNote: document.querySelector('.form-note').innerText, whatsappLabel: document.querySelector('.whatsapp-float').getAttribute('aria-label') };
     })()`);
     console.log(locale, JSON.stringify(state));
     if (state.lang !== locale || state.stored !== locale) throw new Error(`${locale} selection failed`);
     const copy = await evaluate(`translations['${locale}']`);
+    if (state.whatsappLabel !== copy.whatsappChat) throw new Error(`${locale} WhatsApp label failed`);
     if (state.formHeading !== copy.enquiryTitle || state.namePlaceholder !== copy.placeholderName || state.topicOptions[1] !== copy.serviceBusiness || state.formNote !== copy[hasConfiguredKey ? 'enquiryOnlineNote' : 'enquiryNote']) throw new Error(`${locale} form translation failed`);
     if (state.software !== copy.serviceSoftware || state.wayfinders !== 5 || state.cards !== 5 || !state.productOpen || state.productText.some((value) => value !== copy.softwareSoon) || !state.topicOptions.includes(copy.topicSoftware)) throw new Error(`${locale} software service failed`);
     await evaluate("document.querySelectorAll('.software-product').forEach((product) => { product.open = false; })");

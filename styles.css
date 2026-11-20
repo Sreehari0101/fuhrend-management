@@ -269,7 +269,11 @@ h1, h2, h3, p { overflow-wrap: break-word; }
 .footer-links a, .footer-contact a { min-height: 27px; color: #d3e0d8; font-size: 13px; }
 .footer-contact address { margin-top: 6px; color: #d3e0d8; font-size: 13px; font-style: normal; line-height: 1.5; }
 .footer-links a:hover, .footer-contact a:hover, .footer-bottom a:hover { color: white; text-decoration: underline; text-underline-offset: 4px; }
-.footer-bottom { min-height: 54px; display: flex; justify-content: space-between; align-items: center; gap: 20px; border-top: 1px solid rgba(255,255,255,.24); color: #bacac1; font-size: 11px; }
+.footer-bottom { min-height: 54px; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-right: 76px; border-top: 1px solid rgba(255,255,255,.24); color: #bacac1; font-size: 11px; }
+.whatsapp-float { position: fixed; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); z-index: 18; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: #25d366; box-shadow: 0 6px 22px rgba(12,48,45,.22); transition: background .2s ease, transform .2s ease, box-shadow .2s ease; }
+.whatsapp-float img { width: 29px; height: 29px; }
+.whatsapp-float:hover { background: #1ab956; transform: translateY(-2px); box-shadow: 0 9px 25px rgba(12,48,45,.28); }
+.whatsapp-float:focus-visible { outline-offset: 3px; }
 
 /* Motion is opt-in from script so content stays visible without JavaScript. */
 .motion-ready [data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
@@ -440,6 +444,9 @@ h1, h2, h3, p { overflow-wrap: break-word; }
   .footer-brand { font-size: 25px; }
   .footer-contact a, .footer-contact address { font-size: 12px; overflow-wrap: anywhere; }
   .footer-bottom { flex-wrap: wrap; justify-content: space-between; padding-block: 15px; gap: 8px 20px; }
+  .footer-bottom { padding-right: 70px; }
+  .whatsapp-float { right: max(14px, env(safe-area-inset-right)); bottom: max(14px, env(safe-area-inset-bottom)); width: 52px; height: 52px; }
+  .whatsapp-float img { width: 27px; height: 27px; }
   .motion-ready [data-reveal] { transform: translateY(18px); transition-duration: .72s; }
   .motion-ready [data-reveal="image"] { transform: scale(1.04); transition-duration: .9s; }
 }

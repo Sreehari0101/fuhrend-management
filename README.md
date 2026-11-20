@@ -25,6 +25,7 @@ The public email address does not determine the Web3Forms recipient. Before laun
 ## Images
 
 - The header mark is a clean vector redraw of the supplied Fuhrend Management monogram; the supplied raster logo remains in `assets/fuhrend-logo.jpeg`.
+- The floating WhatsApp glyph comes from [Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/whatsapp.svg).
 - Consultation: [Olena Kholina on Unsplash](https://unsplash.com/photos/two-people-reviewing-documents-at-a-table-MhqUBTxQ3Hw).
 - Mobile consultation: [Pavel Danilyuk on Pexels](https://www.pexels.com/photo/woman-signing-a-document-near-a-laptop-7518972/).
 - The Business consultancy, Digital marketing, Expat services and Software solutions card images were generated specifically for this website. They depict illustrative scenes, not Fuhrend staff, clients or released products.
